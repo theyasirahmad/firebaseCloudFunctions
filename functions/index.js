@@ -1,8 +1,6 @@
 /* eslint-disable promise/always-return */
 /* eslint-disable consistent-return */
 const functions = require('firebase-functions');
-// const gcs = require('@google-cloud/storage')();// () calling method is now obselete
-// const gcs = require('@google-cloud/storage');// () calling method is now obselete
 const os = require('os');
 const path = require('path');
 const cors = require('cors')({ origin: true });
@@ -14,8 +12,8 @@ const spawn = require('child-process-promise').spawn;
 const { Storage } = require('@google-cloud/storage');
 const gcs = new Storage({
     // config..
-    projectId: "hallreservation-2020",
-    keyFilename: "hallreservation-2020-firebase-adminsdk-8qix5-164b7c8b90.json"
+    projectId: "hallreservation-2020", //id of project
+    keyFilename: "hallreservation-2020-firebase-adminsdk-8qix5-164b7c8b90.json" // name of file in same folder
 });
 
 // onChange function was obselete thats why onFinalizes 
