@@ -8,6 +8,8 @@ const path = require('path');
 const cors = require('cors')({ origin: true });
 const Busboy = require('busboy');
 const fs = require('fs');
+const spawn = require('child-process-promise').spawn;
+
 
 const { Storage } = require('@google-cloud/storage');
 const gcs = new Storage({
@@ -25,28 +27,32 @@ const gcs = new Storage({
 
 // onChange function was obselete thats why onFinalizes 
 exports.onBucketChange = functions.storage.object().onFinalize(event => {
-    // console.log(event);
-    // code does not work due to obseletion of some components i gues
     console.log(event);
     const object = event;
     const bucket = object.bucket;
     const contentType = object.contentType;
     const filePath = object.name;
     console.log("File Change Detected, Fucntion execution started");
-
-    if(path.basename(filePath).startsWith('renamed-')){
-        console.log('already renamed file')
-       return;
+        //
+    if (object.resourceState === 'not_exists'){
+        console.log('we deleted a file, exit..');
+        return;
+    }
+    if (path.basename(filePath).startsWith('resized-')) {
+        console.log('already resized file');
+        return;
     }
     const destBucket = gcs.bucket(bucket);
     const tempFilePath = path.join(os.tmpdir(), path.basename(filePath));
     const metadata = { contentType: contentType };
     return destBucket.file(filePath).download({
-        destination:tempFilePath
-    }).then(()=>{
+        destination: tempFilePath
+    }).then(() => {
+        return spawn('convert', [tempFilePath, '-resize', '500x500', tempFilePath])
+    }).then(() => {
         return destBucket.upload(tempFilePath, {
-            destination:'renamed-'+path.basename(filePath),
-            metadata:metadata
+            destination: 'resized-' + path.basename(filePath),
+            metadata: metadata
         })
     })
 });
