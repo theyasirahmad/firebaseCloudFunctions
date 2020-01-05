@@ -18,15 +18,8 @@ const gcs = new Storage({
     keyFilename: "hallreservation-2020-firebase-adminsdk-8qix5-164b7c8b90.json"
 });
 
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
-
 // onChange function was obselete thats why onFinalizes 
-exports.onBucketChange = functions.storage.object().onFinalize(event => {
+exports.onFileChange = functions.storage.object().onFinalize(event => {
     console.log(event);
     const object = event;
     const bucket = object.bucket;
@@ -57,44 +50,44 @@ exports.onBucketChange = functions.storage.object().onFinalize(event => {
     })
 });
 
-// exports.uploadFile = functions.https.onRequest((req, res) => {
-//     cors(req, res, () => {
+exports.uploadFile = functions.https.onRequest((req, res) => {
+    cors(req, res, () => {
 
-//         if (req.method !== 'POST') {
-//             return res.status(500).json({
-//                 message: 'Not allowed'
-//             });
-//         }
-//         const busboy = new Busboy({ headers: req.headers });
-//         let uploadData = null;
-//         busboy.on('file', (fieldName, file, filename, encoding, mimetype) => {
-//             const filepath = path.join(os.tmpdir(), filename);
-//             uploadData = { file: filepath, type: mimetype };
-//             file.pipe(fs.createWriteStream(filepath));
-//         });
+        if (req.method !== 'POST') {
+            return res.status(500).json({
+                message: 'Not allowed'
+            });
+        }
+        const busboy = new Busboy({ headers: req.headers });
+        let uploadData = null;
+        busboy.on('file', (fieldName, file, filename, encoding, mimetype) => {
+            const filepath = path.join(os.tmpdir(), filename);
+            uploadData = { file: filepath, type: mimetype };
+            file.pipe(fs.createWriteStream(filepath));
+        });
 
-//         busboy.on('finish', () => {
-//             const bucket = Storage.Bucket('hallreservation-2020.appspot.com');
-//             // eslint-disable-next-line promise/catch-or-return
-//             bucket.upload(uploadData.file, {
-//                 uploadType: 'media',
-//                 metadata: {
-//                     metadata: {
-//                         contentType: uploadData.type
-//                     }
-//                 }
-//             }).then(() => {
+        busboy.on('finish', () => {
+            const bucket = gcs.bucket('hallreservation-2020.appspot.com');
+            // eslint-disable-next-line promise/catch-or-return
+            bucket.upload(uploadData.file, {
+                uploadType: 'media',
+                metadata: {
+                    metadata: {
+                        contentType: uploadData.type
+                    }
+                }
+            }).then(() => {
 
-//                 res.status(200).json({
-//                     message: 'It works'
-//                 });
-//             }).catch(() => {
-//                 return res.status(500).json({
-//                     error: err
-//                 })
-//             })
-//         });
-//         busboy.end(req.rawBody);
-//     });
+                res.status(200).json({
+                    message: 'It works'
+                });
+            }).catch(() => {
+                return res.status(500).json({
+                    error: err
+                })
+            })
+        });
+        busboy.end(req.rawBody);
+    });
 
-// });
+});
