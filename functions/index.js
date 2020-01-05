@@ -10,10 +10,12 @@ const spawn = require('child-process-promise').spawn;
 
 
 const { Storage } = require('@google-cloud/storage');
+
+
 const gcs = new Storage({
     // config..
-    projectId: "hallreservation-2020", //id of project
-    keyFilename: "hallreservation-2020-firebase-adminsdk-8qix5-164b7c8b90.json" // name of file in same folder
+    projectId: "project id here", //id of project
+    keyFilename: "hallreservation-2020-firebase-adminsdk-8qix5-164b7c8b90.json" // name of file in same folder every project have different
 });
 
 // onChange function was obselete thats why onFinalizes 
@@ -65,7 +67,7 @@ exports.uploadFile = functions.https.onRequest((req, res) => {
         });
 
         busboy.on('finish', () => {
-            const bucket = gcs.bucket('hallreservation-2020.appspot.com');
+            const bucket = gcs.bucket('project id here .appspot.com');
             // eslint-disable-next-line promise/catch-or-return
             bucket.upload(uploadData.file, {
                 uploadType: 'media',
