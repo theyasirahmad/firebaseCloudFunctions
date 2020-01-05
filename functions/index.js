@@ -91,3 +91,15 @@ exports.uploadFile = functions.https.onRequest((req, res) => {
     });
 
 });
+
+exports.onDataAdded = functions.firestore.document('Users/{id}').onCreate((event)=>{
+
+    // console.log();
+    
+    // const data = event.dat
+    const newData = { 
+        msg: event._fieldsProto.msg.stringValue.toUpperCase() // most probably will covert to uppercase
+    };
+    return event.ref.set(newData);
+    // return;
+});
